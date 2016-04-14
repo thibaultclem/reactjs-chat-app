@@ -8,6 +8,7 @@
 		<script src="https://fb.me/react-15.0.1.min.js"></script>
 		<script src="https://fb.me/react-dom-15.0.1.min.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.23/browser.min.js"></script>
+		<script src="https://code.jquery.com/jquery-2.2.3.min.js"></script>
 	</head>
 	<body>
 		<div id="app">
@@ -31,10 +32,15 @@
 							{
 								name: "ThibaultClment",
 								time: new Date(),
-								text: "Welcome to my chat app build with React"
+								text: "Welcome to my chat app built with React"
 							}
 						]
 						}
+					},
+
+					//Invoked immediately after the component's updates are flushed to the DOM.
+					componentDidUpdate: function() {
+						$("#message-list").scrollTop($("#message-list")[0].scrollHeight);
 					},
 
 					//Change the name of the user-menu
@@ -45,6 +51,23 @@
 						this.setState({name:myName});
 					},
 
+					//Sent the message whenver the enter key is press
+					sendMessage: function(event) {
+						var text = event.target.value;
+						if(event.keyCode == 13 && text != "") {
+							var message = {
+								name: this.state.name,
+								time: new Date(),
+								text: text
+							}
+
+							//Add the new message to the messages arrays
+							this.setState({messages: this.state.messages.concat(message)})
+							//The msg input become empty
+							$('#msg-input').val('')
+						}
+					},
+
 					//Any React component has a render function
 					render: function() {
 
@@ -53,8 +76,9 @@
 						var messageList = this.state.messages.map(function(message, i) {
 							var text = message.text
 							return (
-								{/* key={i} helps React to render the markup as quick as possible */}
+
 								<div key={i} className="message">
+								{/* key={i} helps React to render the markup as quick as possible */}
 									<a href={"https://twitter.com/" + message.name + "/"} target="_blank"><img src={"https://twitter.com/" + message.name + "/profile_image"} className="message_profile-pic" /></a>
 													<a href={"https://twitter.com/" + message.name + "/"} target="_blank" className="message_username">{message.name}</a>
 									<span className="message_timestamp">{message.time.toLocaleTimeString()}</span>
@@ -112,7 +136,7 @@
 										<p className="disclaimer">This demo is not created by, affiliated with, or supported by Slack Technologies, Inc.</p>
 									</div>
 									<div className="input-box">
-										<input type="text" className="input-box_text" />
+										<input id="msg-input" type="text" className="input-box_text" onKeyDown={this.sendMessage} />
 									</div>
 								</div>
 							</div>)
