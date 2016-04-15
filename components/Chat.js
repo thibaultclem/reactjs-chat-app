@@ -1,6 +1,7 @@
 var React = require('react')
 var ReactDOM = require('react-dom')
 var Messages = require('./Messages');
+var Channels = require('./Channels');
 
 //Create a new React component named chat
 var Chat = React.createClass({
@@ -17,13 +18,14 @@ var Chat = React.createClass({
         name: "ThibaultClment",
         time: new Date(),
         text: "Hi there! 😘"
-      },
-      {
-        name: "ThibaultClment",
-        time: new Date(),
-        text: "Welcome to my chat app built with React"
-      }
-    ]
+        },
+        {
+          name: "ThibaultClment",
+          time: new Date(),
+          text: "Welcome to my chat app built with React"
+        }
+      ],
+      channels: ['general','soccer']
     }
   },
 
@@ -78,18 +80,7 @@ var Chat = React.createClass({
         </div>
         <div className="main">
           <div className="listings">
-          <div className="listings_channels">
-            <h2 className="listings_header">Channels</h2>
-            <ul className="channel_list">
-              <li className="channel active">
-                <a className="channel_name">
-                  <span className="unread">0</span>
-                  <span><span className="prefix">#</span>general</span>
-                </a>
-              </li>
-            </ul>
-          </div>
-          <div className="listings_direct-messages"></div>
+            <Channels channels={this.state.channels} />
           </div>
           <div className="message-history">
             {/* Add the Messages component and passes the arrays of messages as a property */}
@@ -111,5 +102,5 @@ var Chat = React.createClass({
 //Render the React chat component I just created
 ReactDOM.render(<Chat />, document.getElementById('app'));
 
-//
+//Useful for browserify
 module.exports = Chat;
