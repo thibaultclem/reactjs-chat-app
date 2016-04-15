@@ -15,6 +15,8 @@ const customStyles = {
   }
 };
 
+const DEFAULT_CHANNEL = 'general';
+
 //Create a new React component named chat
 var Chat = React.createClass({
 
@@ -24,22 +26,37 @@ var Chat = React.createClass({
       //initial state will have a "name" variable with value = "Anonymous"
       //This "name" varuable is accessible for render as "this.state.name"
       name: null,
-      //Add a an array of message object
-      messages: [
-        {
+      //messages is now an associate of arrays
+      messages: {},
+      channels: [],
+      currentChannel: null
+    }
+  },
+
+  //Invoked once, only on the client (not on the server),
+  //immediately after the initial rendering occurs
+  componentDidMount: function() {
+    this.createChannel(DEFAULT_CHANNEL);
+
+    var messages = {};
+
+    messages[DEFAULT_CHANNEL] = [
+      {
         name: "ThibaultClment",
         time: new Date(),
         text: "Hi there! 😘"
-        },
-        {
-          name: "ThibaultClment",
-          time: new Date(),
-          text: "Welcome to my chat app built with React"
-        }
-      ],
-      channels: ['general'],
-      currentChannel: 'general'
-    }
+      },
+      {
+        name: "ThibaultClment",
+        time: new Date(),
+        text: "Welcome to my chat app built with React"
+      }
+    ]
+
+    this.setState({
+      messages: messages
+    })
+
   },
 
   //Invoked immediately after the component's updates are flushed to the DOM.
@@ -58,7 +75,9 @@ var Chat = React.createClass({
       }
 
       //Add the new message to the messages arrays
-      this.setState({messages: this.state.messages.concat(message)})
+      var messages = this.state.messages;
+      messages[this.state.currentChannel].push(message);
+      this.setState({messages: messages});
       //The msg input become empty
       $('#msg-input').val('')
     }
@@ -66,7 +85,15 @@ var Chat = React.createClass({
 
   createChannel: function(newChannel) {
     if(!(newChannel in this.state.channels)) {
-      this.setState({channels: this.state.channels.concat(newChannel)});
+      var messages = this.state.messages;
+      //This new channel has an empty list of messages
+      messages[newChannel] = [];
+
+      this.setState({
+        channels: this.state.channels.concat(newChannel),
+        messages: messages
+      });
+
       this.joinChannel(newChannel);
     }
   },
@@ -115,7 +142,7 @@ var Chat = React.createClass({
           <div className="channel-menu">
             <span className="channel-menu_name">
               <span className="channel-menu_prefix">#</span>
-              general
+              {this.state.currentChannel}
             </span>
           </div>
         </div>
@@ -129,7 +156,8 @@ var Chat = React.createClass({
           </div>
           <div className="message-history">
             {/* Add the Messages component and passes the arrays of messages as a property */}
-            <Messages messages={this.state.messages} />
+            <Messages
+              messages={this.state.messages[this.state.currentChannel]} />
           </div>
         </div>
         <div className="footer">

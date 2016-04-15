@@ -5,6 +5,9 @@ var Messages = React.createClass({
 
   render: function() {
 
+    //If property messages is not set (= null), don't rendering (case on the first load)
+    if(!this.props.messages) {return null};
+
     //A map function iterate to each elements of an array (here is message)
     //and return the transform version of it
     var messageList = this.props.messages.map(function(message, i) {
