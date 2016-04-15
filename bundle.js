@@ -1,8 +1,45 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 var React = require('react');
 var ReactDOM = require('react-dom');
+var Modal = require('react-modal');
+
+const customStyles = {
+  content : {
+    top                   : '50%',
+    left                  : '50%',
+    right                 : 'auto',
+    bottom                : 'auto',
+    marginRight           : '-50%',
+    transform             : 'translate(-50%, -50%)'
+  }
+};
 
 var Channels = React.createClass({displayName: "Channels",
+
+  getInitialState: function() {
+    return { modalIsOpen: false };
+  },
+
+  openModal: function() {
+    this.setState({modalIsOpen: true});
+  },
+
+  closeModal: function() {
+    this.setState({modalIsOpen: false});
+  },
+
+  joinNewChannel: function() {
+    var newChannel = $('#new-channel-name').val().trim();
+    if(newChannel != "") {
+      this.props.createChannel(newChannel);
+      this.closeModal();
+    }
+  },
+
+  onEnterForChannel: function(event) {
+    if (event.nativeEvent.keyCode != 13) return;
+    this.joinNewChannel()
+  },
 
   render: function() {
 
@@ -22,10 +59,25 @@ var Channels = React.createClass({displayName: "Channels",
     return (
 
       React.createElement("div", {className: "listings_channels"}, 
+        React.createElement("span", {className: "add_icon", onClick: this.openModal}, "+"), 
         React.createElement("h2", {className: "listings_header"}, "Channels"), 
           React.createElement("ul", {className: "channel_list"}, 
             channelList
+          ), 
+
+          React.createElement(Modal, {
+          isOpen: this.state.modalIsOpen, 
+          onAfterOpen: this.afterOpenModal, 
+          onRequestClose: this.closeModal, 
+          style: customStyles}, 
+
+          React.createElement("h2", {className: "text-center"}, "Enter a channel"), 
+          React.createElement("div", null, 
+            "# ", React.createElement("input", {id: "new-channel-name", type: "text", onKeyPress: this.onEnterForChannel}), 
+            React.createElement("button", {className: "btn", onClick: this.joinNewChannel}, " Join")
           )
+        )
+
       )
 
     )
@@ -35,7 +87,7 @@ var Channels = React.createClass({displayName: "Channels",
 
 module.exports = Channels;
 
-},{"react":187,"react-dom":44}],2:[function(require,module,exports){
+},{"react":187,"react-dom":44,"react-modal":51}],2:[function(require,module,exports){
 var React = require('react')
 var ReactDOM = require('react-dom')
 var Messages = require('./Messages');
@@ -101,6 +153,12 @@ var Chat = React.createClass({displayName: "Chat",
     }
   },
 
+  createChannel: function(newChannel) {
+    if(!(newChannel in this.state.channels)) {
+      this.setState({channels: this.state.channels.concat(newChannel)});
+    }
+  },
+
   enterName: function(event) {
     var newName = $('#new-name').val().trim();
     if(newName == "") {
@@ -147,7 +205,7 @@ var Chat = React.createClass({displayName: "Chat",
         ), 
         React.createElement("div", {className: "main"}, 
           React.createElement("div", {className: "listings"}, 
-            React.createElement(Channels, {channels: this.state.channels})
+            React.createElement(Channels, {channels: this.state.channels, createChannel: this.createChannel})
           ), 
           React.createElement("div", {className: "message-history"}, 
             /* Add the Messages component and passes the arrays of messages as a property */
