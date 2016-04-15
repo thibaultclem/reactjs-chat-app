@@ -37,7 +37,8 @@ var Chat = React.createClass({
           text: "Welcome to my chat app built with React"
         }
       ],
-      channels: ['general','soccer']
+      channels: ['general'],
+      currentChannel: 'general'
     }
   },
 
@@ -66,7 +67,12 @@ var Chat = React.createClass({
   createChannel: function(newChannel) {
     if(!(newChannel in this.state.channels)) {
       this.setState({channels: this.state.channels.concat(newChannel)});
+      this.joinChannel(newChannel);
     }
+  },
+
+  joinChannel: function(channelName) {
+    this.setState({currentChannel: channelName});
   },
 
   enterName: function(event) {
@@ -115,7 +121,11 @@ var Chat = React.createClass({
         </div>
         <div className="main">
           <div className="listings">
-            <Channels channels={this.state.channels} createChannel={this.createChannel} />
+            <Channels
+              channels={this.state.channels}
+              createChannel={this.createChannel}
+              currentChannel={this.state.currentChannel}
+              joinChannel={this.joinChannel} />
           </div>
           <div className="message-history">
             {/* Add the Messages component and passes the arrays of messages as a property */}
